@@ -21,4 +21,17 @@ class SlidingWindowRateLimiter:
         self._requests[key] = timestamps
         return False
 
+    def cleanup(self):
+        now = self._clock()
+        window_start = now - self.window_seconds
+
+        expired_keys = [
+            key for key, timestamps in self._requests.items()
+            if not [t for t in timestamps if t > window_start]
+
+        ]
+
+        for key in expired_keys:
+            del self._requests[key] # Note to self, in production this data may be saved to primary storage for analytics.
+            
 

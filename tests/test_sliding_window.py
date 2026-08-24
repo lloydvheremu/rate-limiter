@@ -58,6 +58,24 @@ class TestSlidingWindowRateLimiter(unittest.TestCase):
         self.assertTrue(limiter.allow("user1")) # one free slot freed....
         self.assertFalse(limiter.allow("user1")) # # no free slots available
 
+    def test_cleanup_evicts_only_idle_keys(self):
+        current_time = [1000.0]
+        clock = lambda: current_time[0]
+
+        limiter = SlidingWindowRateLimiter(max_requests=3, window_seconds=10, clock=clock)
+        limiter.allow("user1")
+        current_time[0] = 1005.0 
+        limiter.allow("user2")
+
+        current_time[0] = 1011.0 # user1's request now expired
+
+
+        limiter.cleanup()
+
+        self.assertNotIn("user1", limiter._requests)
+        self.assertIn("user2", limiter._requests)
+
+
 if __name__ == "__main__":
      unittest.main() 
 
