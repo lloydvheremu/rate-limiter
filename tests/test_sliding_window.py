@@ -13,7 +13,19 @@ class TestSlidingWindowRateLimiter(unittest.TestCase):
         self.assertTrue(limiter.allow("user1"))
         self.assertTrue(limiter.allow("user1"))
         self.assertFalse(limiter.allow("user1"))
+    def test_request_allowed_after_window_slides(self):
+        current_time = [1000.0]
+        clock = lambda: current_time[0]
 
+        limiter = SlidingWindowRateLimiter(max_requests=3, window_seconds=10, clock=clock)
+
+        limiter.allow("user1")
+        limiter.allow("user1")
+        limiter.allow("user1")
+        self.assertFalse(limiter.allow("user1")) #4th call, still within window, reject.
+
+        current_time[0] = 1011.0 # simulate 11 seconds passing
+        self.assertTrue(limiter.allow("user1")) # old requests aged out, allowed again.
 if __name__ == "__main__":
      unittest.main() 
 
