@@ -7,5 +7,13 @@ class TestSlidingWindowRateLimiter(unittest.TestCase):
         limiter = SlidingWindowRateLimiter(max_requests=3, window_seconds=10)
         self.assertTrue(limiter.allow("user1"))
 
+    def test_requests_beyond_limit_are_rejected(self):
+        limiter = SlidingWindowRateLimiter(max_requests=3, window_seconds=10)
+        self.assertTrue(limiter.allow("user1"))
+        self.assertTrue(limiter.allow("user1"))
+        self.assertTrue(limiter.allow("user1"))
+        self.assertFalse(limiter.allow("user1"))
+
 if __name__ == "__main__":
-    unittest.main()
+     unittest.main() 
+
