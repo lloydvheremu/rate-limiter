@@ -26,6 +26,17 @@ class TestSlidingWindowRateLimiter(unittest.TestCase):
 
         current_time[0] = 1011.0 # simulate 11 seconds passing
         self.assertTrue(limiter.allow("user1")) # old requests aged out, allowed again.
+    def test_different_keys_are_limited_independently(self):
+        limiter = SlidingWindowRateLimiter(max_requests=2, window_seconds=10)
+
+        self.assertTrue(limiter.allow("user1"))
+        self.assertTrue(limiter.allow("user1"))
+        self.assertFalse(limiter.allow("user1")) # =user now at limit
+
+        self.assertTrue(limiter.allow("user2"))
+        self.assertTrue(limiter.allow("user2"))
+        self.assertFalse(limiter.allow("user2"))
+
 if __name__ == "__main__":
      unittest.main() 
 
