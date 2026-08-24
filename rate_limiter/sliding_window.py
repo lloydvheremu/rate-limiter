@@ -1,6 +1,8 @@
 import time
+from rate_limiter.base import RateLimiter
 
-class SlidingWindowRateLimiter:
+
+class SlidingWindowRateLimiter(RateLimiter):
     def __init__(self, max_requests, window_seconds, clock=None):
         self.max_requests = max_requests
         self.window_seconds = window_seconds
