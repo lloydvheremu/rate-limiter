@@ -29,6 +29,17 @@ class TestTokenBucketRateLimiter(unittest.TestCase):
         self.assertTrue(limiter.allow("user1")) # enough for one request 
         self.assertFalse(limiter.allow("user1")) # but not for two 
 
+    def test_different_keys_are_limited_independently(self):
+        limiter = TokenBucketRateLimiter(max_requests=2, window_seconds=10)
+
+        self.assertTrue(limiter.allow("user1"))
+        self.assertTrue(limiter.allow("user1"))
+        self.assertFalse(limiter.allow("user1")) # user1's bucket empty 
+
+        self.assertTrue(limiter.allow("user2")) # user2's unaffected 
+        self.assertTrue(limiter.allow("user2"))
+        self.assertFalse(limiter.allow("user2")) # user2's bucket separately empty 
+
 if __name__ == "__main__":
     unittest.main()
 
